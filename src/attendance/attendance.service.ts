@@ -125,14 +125,6 @@ export class AttendanceService {
     return saved;
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.attendanceRepository.delete(id);
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`Attendance with id ${id} not found`);
-    }
-  }
-
   async findFiltered(
     query: {
       username?: string;

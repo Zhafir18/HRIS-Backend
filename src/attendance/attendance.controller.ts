@@ -113,10 +113,4 @@ export class AttendanceController {
   checkOut(@Req() req) {
     return this.attendanceService.checkOut(req.user.userId);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.attendanceService.remove(id);
-  }
 }
