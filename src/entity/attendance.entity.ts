@@ -33,8 +33,8 @@ export class Attendance {
   @Column({ type: 'nvarchar', length: 100, nullable: false })
   location: string;
 
-  @Column({ type: 'varbinary', length: 'max', nullable: false, select: false })
-  face_recognition: Buffer;
+  @Column({ type: 'nvarchar', length: 'max', nullable: false })
+  face_recognition: string;
   
   @Exclude()
   @Column('datetime', { nullable: false, default: () => 'GETDATE()' })

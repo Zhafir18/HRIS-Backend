@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Attendance, AttendanceStatus } from 'src/entity/attendance.entity';
 import { PaginatedResult } from 'src/common/pagination.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AttendanceService {
@@ -33,6 +35,9 @@ export class AttendanceService {
       throw new NotFoundException(`Attendance with id ${id} not found`);
     }
 
+    if (attendance && attendance.face_recognition) {
+      attendance.face_recognition = `/assets/face_recognition/${attendance.face_recognition}`;
+    }
     return attendance;
   }
 
@@ -64,7 +69,18 @@ export class AttendanceService {
         /^data:image\/\w+;base64,/,
         '',
       );
-      data.face_recognition = Buffer.from(base64Data, 'base64');
+      
+      const fileName = `attendance_${user_id}_${Date.now()}.png`;
+      const uploadDir = path.join(process.cwd(), 'assets', 'face_recognition');
+      
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const filePath = path.join(uploadDir, fileName);
+      fs.writeFileSync(filePath, base64Data, 'base64');
+      
+      data.face_recognition = fileName;
     }
 
     const newData = this.attendanceRepository.create({
@@ -76,7 +92,11 @@ export class AttendanceService {
       updated_at: now,
     });
 
-    return this.attendanceRepository.save(newData);
+    const saved = await this.attendanceRepository.save(newData);
+    if (saved.face_recognition) {
+      saved.face_recognition = `/assets/face_recognition/${saved.face_recognition}`;
+    }
+    return saved;
   }
 
   async checkOut(user_id: string): Promise<Attendance> {
@@ -101,7 +121,8 @@ export class AttendanceService {
     attendance.log_out_time = now;
     attendance.updated_at = now;
 
-    return this.attendanceRepository.save(attendance);
+    const saved = await this.attendanceRepository.save(attendance);
+    return saved;
   }
 
   async remove(id: string): Promise<void> {
@@ -130,8 +151,7 @@ export class AttendanceService {
 
     const qb = this.attendanceRepository
       .createQueryBuilder('attendance')
-      .leftJoinAndSelect('attendance.user', 'user')
-      .addSelect('attendance.face_recognition');
+      .leftJoinAndSelect('attendance.user', 'user');
 
     if (userId) {
       qb.andWhere('attendance.user_id = :userId', { userId });
@@ -177,9 +197,8 @@ export class AttendanceService {
       .getManyAndCount();
 
     const formattedData = data.map((item) => {
-      if (item.face_recognition && Buffer.isBuffer(item.face_recognition)) {
-        (item as any).face_recognition =
-          item.face_recognition.toString('base64');
+      if (item.face_recognition) {
+        item.face_recognition = `/assets/face_recognition/${item.face_recognition}`;
       }
       return item;
     });
