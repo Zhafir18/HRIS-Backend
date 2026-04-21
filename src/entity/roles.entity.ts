@@ -7,19 +7,19 @@ export class Roles {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'nvarchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
   @OneToMany(() => Users, (user) => user.role)

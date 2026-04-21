@@ -18,34 +18,34 @@ export class Attendance {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('uniqueidentifier')
+  @Column({ type: 'uuid' })
   user_id: string;
 
-  @Column('datetime', { nullable: false })
+  @Column({ type: 'timestamp', nullable: false })
   log_in_time: Date;
 
-  @Column('datetime', { nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   log_out_time: Date;
 
-  @Column('nvarchar', { nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   status: AttendanceStatus;
 
-  @Column({ type: 'nvarchar', length: 100, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   location: string;
 
-  @Column({ type: 'nvarchar', length: 'max', nullable: false })
+  @Column({ type: 'text', nullable: false })
   face_recognition: string;
   
   @Exclude()
-  @Column('datetime', { nullable: false, default: () => 'GETDATE()' })
+  @Column({ type: 'timestamp', nullable: false, default: () => 'now()' })
   created_at: Date;
 
   @Exclude()
-  @Column('datetime', { nullable: true, default: () => 'GETDATE()' })
+  @Column({ type: 'timestamp', nullable: true, default: () => 'now()' })
   updated_at: Date;
 
   @Exclude()
-  @Column('datetime', { nullable: true, default: () => 'GETDATE()' })
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
   @ManyToOne(() => Users, (user) => user.attendance)

@@ -15,29 +15,29 @@ export class Users {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'nvarchar', length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   username: string;
 
-  @Column({ type: 'nvarchar', length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   email: string;
 
   @Exclude()
-  @Column({ type: 'nvarchar', length: 255, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
-  @Column('uniqueidentifier')
+  @Column({ type: 'uuid' })
   role_id: string;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
   @Exclude()
-  @Column('datetime')
+  @Column({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 
   @ManyToOne(() => Roles, (role) => role.users)

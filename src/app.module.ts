@@ -9,7 +9,7 @@ import { Roles } from './entity/roles.entity';
 import { AttendanceModule } from './attendance/attendance.module';
 import { Attendance } from './entity/attendance.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -18,18 +18,21 @@ import { join } from 'path';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'mssql',
-      host: 'localhost',
-      port: 1433,
-      username: 'Zhafir',
-      password: '123456',
-      database: 'Hris',
-      entities: [Users, Roles, Attendance],
-      synchronize: false,
-      options: {
-        encrypt: false,
-      },
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: configService.get<any>('DB_TYPE'),
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        entities: [Users, Roles, Attendance],
+        synchronize: configService.get<boolean>('DB_SYNCHRONIZE'),
+        options: {
+          encrypt: false,
+        },
+      }),
     }),
     UsersModule,
     RolesModule,
