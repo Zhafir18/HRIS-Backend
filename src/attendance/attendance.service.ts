@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Attendance, AttendanceStatus } from 'src/entity/attendance.entity';
+import { Attendance, AttendanceStatus, WorkMode } from 'src/entity/attendance.entity';
+import { Office } from 'src/entity/office.entity';
 import { PaginatedResult } from 'src/common/pagination.dto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -15,7 +16,24 @@ export class AttendanceService {
   constructor(
     @InjectRepository(Attendance)
     private readonly attendanceRepository: Repository<Attendance>,
+    @InjectRepository(Office)
+    private readonly officeRepository: Repository<Office>,
   ) {}
+
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3; // metres
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // in metres
+  }
 
   findAll(
     userId?: string,
@@ -64,6 +82,23 @@ export class AttendanceService {
         ? AttendanceStatus.TELAT
         : AttendanceStatus.TIDAK_TELAT;
 
+    let work_mode = WorkMode.WFH;
+    if (data.latitude && data.longitude) {
+      const offices = await this.officeRepository.find();
+      for (const office of offices) {
+        const distance = this.calculateDistance(
+          Number(data.latitude),
+          Number(data.longitude),
+          Number(office.latitude),
+          Number(office.longitude),
+        );
+        if (distance <= office.radius) {
+          work_mode = WorkMode.WFO;
+          break;
+        }
+      }
+    }
+
     if (data.face_recognition && typeof data.face_recognition === 'string') {
       const base64Data = (data.face_recognition as any as string).replace(
         /^data:image\/\w+;base64,/,
@@ -88,6 +123,7 @@ export class AttendanceService {
       user_id,
       log_in_time: now,
       status,
+      work_mode,
       created_at: now,
       updated_at: now,
     });

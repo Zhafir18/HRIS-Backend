@@ -16,6 +16,7 @@ import { PaginatedResult } from 'src/common/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { RolesDecorator } from 'src/auth/roles.decorator';
+import { CheckInDto } from './dto/check-in.dto';
 
 @Controller('attendance')
 export class AttendanceController {
@@ -104,7 +105,7 @@ export class AttendanceController {
 
   @UseGuards(JwtAuthGuard)
   @Post('check-in')
-  checkIn(@Req() req, @Body() body) {
+  checkIn(@Req() req, @Body() body: CheckInDto) {
     return this.attendanceService.checkIn(req.user.userId, body);
   }
 

@@ -3,11 +3,11 @@ import { AttendanceService } from './attendance.service';
 import { AttendanceController } from './attendance.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Attendance } from 'src/entity/attendance.entity';
-import { Users } from 'src/entity/users.entity';
+import { Office } from 'src/entity/office.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Attendance])
+    TypeOrmModule.forFeature([Attendance, Office])
   ],
   providers: [AttendanceService],
   controllers: [AttendanceController]

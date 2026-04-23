@@ -16,6 +16,7 @@ import { PaginatedResult } from 'src/common/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { RolesDecorator } from 'src/auth/roles.decorator';
+import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -60,7 +61,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator('Admin')
   @Post()
-  create(@Body() user: Partial<Users>): Promise<Users> {
+  create(@Body() user: CreateUserDto): Promise<Users> {
     return this.usersService.create(user);
   }
 
@@ -69,7 +70,7 @@ export class UsersController {
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() user: Partial<Users>,
+    @Body() user: UpdateUserDto,
   ): Promise<Users> {
     return this.usersService.update(id, user);
   }

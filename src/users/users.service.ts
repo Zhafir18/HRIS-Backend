@@ -16,6 +16,14 @@ export class UsersService {
     return this.findFiltered({}, page, limit);
   }
 
+  async findByEmail(email: string): Promise<Users> {
+    return this.usersRepository.findOne({
+      where: { email },
+      relations: ['role'],
+      select: ['id', 'email', 'password'],
+    });
+  }
+
   async findOne(id: string): Promise<any> {
     const user = await this.usersRepository.findOne({
       where: { id },

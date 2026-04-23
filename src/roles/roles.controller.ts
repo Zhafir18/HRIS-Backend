@@ -15,6 +15,7 @@ import { PaginatedResult } from 'src/common/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { RolesDecorator } from 'src/auth/roles.decorator';
+import { CreateRoleDto, UpdateRoleDto } from './dto/roles.dto';
 
 @Controller('roles')
 export class RolesController {
@@ -52,7 +53,7 @@ export class RolesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @RolesDecorator('Admin')
   @Post()
-  create(@Body() role: Partial<Roles>): Promise<Roles> {
+  create(@Body() role: CreateRoleDto): Promise<Roles> {
     return this.rolesService.create(role);
   }
 
@@ -61,7 +62,7 @@ export class RolesController {
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() role: Partial<Roles>,
+    @Body() role: UpdateRoleDto,
   ): Promise<Roles> {
     return this.rolesService.update(id, role);
   }

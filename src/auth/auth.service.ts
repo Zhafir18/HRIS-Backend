@@ -1,24 +1,22 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Users } from "src/entity/users.entity";
-import { Repository } from "typeorm";
+import { UsersService } from "src/users/users.service";
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from "src/users/dto/users.dto";
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Users)
-    private usersRepository: Repository<Users>,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
+  async register(data: CreateUserDto) {
+    return this.usersService.create(data);
+  }
+
   async login(email: string, password: string) {
-    const user = await this.usersRepository.findOne({
-      where: { email },
-      relations: ['role'],
-      select: ['id', 'email', 'password'],
-    });
+    const user = await this.usersService.findByEmail(email);
 
     if (!user) {
       throw new UnauthorizedException('User tidak ditemukan');

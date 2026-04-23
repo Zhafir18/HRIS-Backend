@@ -9,6 +9,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { Roles } from './roles.entity';
 import { Attendance } from './attendance.entity';
+import { Department } from './department.entity';
 
 @Entity({ name: 'Users' })
 export class Users {
@@ -25,8 +26,11 @@ export class Users {
   @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   role_id: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  department_id: string;
 
   @Exclude()
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -43,6 +47,10 @@ export class Users {
   @ManyToOne(() => Roles, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
   role: Roles;
+
+  @ManyToOne(() => Department, (department) => department.users)
+  @JoinColumn({ name: 'department_id' })
+  department: Department;
 
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   attendance: Attendance[];

@@ -13,6 +13,11 @@ export enum AttendanceStatus {
   TIDAK_TELAT = 'Normal',
 }
 
+export enum WorkMode {
+  WFO = 'WFO',
+  WFH = 'WFH',
+}
+
 @Entity('attendance')
 export class Attendance {
   @PrimaryGeneratedColumn('uuid')
@@ -29,6 +34,15 @@ export class Attendance {
 
   @Column({ type: 'varchar', nullable: false })
   status: AttendanceStatus;
+
+  @Column({ type: 'varchar', nullable: true })
+  work_mode: WorkMode;
+
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  longitude: number;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   location: string;

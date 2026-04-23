@@ -5,9 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entity/users.entity';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { DepartmentModule } from './department/department.module';
+import { OfficeModule } from './office/office.module';
 import { Roles } from './entity/roles.entity';
 import { AttendanceModule } from './attendance/attendance.module';
 import { Attendance } from './entity/attendance.entity';
+import { Department } from './entity/department.entity';
+import { Office } from './entity/office.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -27,7 +31,7 @@ import { join } from 'path';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [Users, Roles, Attendance],
+        entities: [Users, Roles, Attendance, Department, Office],
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE'),
         options: {
           encrypt: false,
@@ -36,6 +40,8 @@ import { join } from 'path';
     }),
     UsersModule,
     RolesModule,
+    DepartmentModule,
+    OfficeModule,
     AttendanceModule,
     AuthModule,
     ServeStaticModule.forRoot({
