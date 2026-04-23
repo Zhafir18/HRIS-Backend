@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as express from 'express';
+import * as cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './common/response.interceptor';
 
 async function bootstrap() {
@@ -13,6 +14,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.use(cookieParser());
   app.enableCors({
     origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : 'http://localhost:5173',
     credentials: true,
