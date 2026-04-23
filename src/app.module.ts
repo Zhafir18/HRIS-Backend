@@ -16,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { LeaveModule } from './leave/leave.module';
+import { LeaveRequest } from './entity/leave-request.entity';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { join } from 'path';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [Users, Roles, Attendance, Department, Office],
+        entities: [Users, Roles, Attendance, Department, Office, LeaveRequest],
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE'),
         options: {
           encrypt: false,
@@ -48,6 +50,7 @@ import { join } from 'path';
       rootPath: join(process.cwd(), 'assets'),
       serveRoot: '/assets',
     }),
+    LeaveModule,
   ],
   controllers: [AppController],
   providers: [AppService],
