@@ -19,7 +19,6 @@ import { CreateDepartmentDto, UpdateDepartmentDto } from './dto/department.dto';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(): Promise<Department[]> {
     return this.departmentService.findAll();

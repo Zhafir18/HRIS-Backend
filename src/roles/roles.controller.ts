@@ -36,8 +36,6 @@ export class RolesController {
     return this.rolesService.findAll(page, limit);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @RolesDecorator('Admin')
   @Get('dropdown')
   findRoles(): Promise<Roles[]> {
     return this.rolesService.findRoles();
