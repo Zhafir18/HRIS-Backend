@@ -13,6 +13,7 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   imports: [
     UsersModule,
+    TypeOrmModule.forFeature([Users]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

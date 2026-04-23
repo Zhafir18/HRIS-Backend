@@ -16,7 +16,7 @@ export class UsersService {
     return this.findFiltered({}, page, limit);
   }
 
-  async findByEmail(email: string): Promise<Users> {
+  async findByEmail(email: string): Promise<Users | null> {
     return this.usersRepository.findOne({
       where: { email },
       relations: ['role'],
