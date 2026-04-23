@@ -66,7 +66,7 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .where('attendance.user_id = :user_id', { user_id })
       .andWhere(
-        'CAST(attendance.log_in_time AS DATE) = CAST(GETDATE() AS DATE)',
+        'CAST(attendance.log_in_time AS DATE) = CURRENT_DATE',
       )
       .getOne();
 
@@ -142,7 +142,7 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .where('attendance.user_id = :user_id', { user_id })
       .andWhere(
-        'CAST(attendance.log_in_time AS DATE) = CAST(GETDATE() AS DATE)',
+        'CAST(attendance.log_in_time AS DATE) = CURRENT_DATE',
       )
       .getOne();
 
