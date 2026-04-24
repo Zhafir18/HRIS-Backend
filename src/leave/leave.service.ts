@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LeaveRequest, LeaveStatus } from 'src/entity/leave-request.entity';
+import { Users } from 'src/entity/users.entity';
 import { CreateLeaveRequestDto, UpdateLeaveStatusDto } from './dto/leave.dto';
 import { PaginatedResult } from 'src/common/pagination.dto';
 import { NotificationService } from 'src/notification/notification.service';
@@ -11,16 +12,35 @@ export class LeaveService {
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRepository: Repository<LeaveRequest>,
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
     private readonly notificationService: NotificationService,
   ) {}
 
   async create(user_id: string, data: CreateLeaveRequestDto): Promise<LeaveRequest> {
+    const user = await this.usersRepository.findOne({ where: { id: user_id } });
     const leave = this.leaveRepository.create({
       ...data,
       user_id,
       status: LeaveStatus.PENDING,
     });
-    return this.leaveRepository.save(leave);
+    const savedLeave = await this.leaveRepository.save(leave);
+
+    // Notify Admins
+    const admins = await this.usersRepository.find({
+      where: { role: { name: 'Admin' } },
+      relations: ['role'],
+    });
+
+    for (const admin of admins) {
+      await this.notificationService.create(
+        admin.id,
+        'New Leave Request',
+        `${user?.username || 'An employee'} has requested leave from ${data.start_date} to ${data.end_date}.`,
+      );
+    }
+
+    return savedLeave;
   }
 
   async findMyLeaves(user_id: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<LeaveRequest>> {
