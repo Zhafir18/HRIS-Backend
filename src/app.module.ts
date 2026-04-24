@@ -18,6 +18,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LeaveModule } from './leave/leave.module';
 import { LeaveRequest } from './entity/leave-request.entity';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { LeaveRequest } from './entity/leave-request.entity';
       serveRoot: '/assets',
     }),
     LeaveModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
