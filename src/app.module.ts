@@ -21,6 +21,8 @@ import { LeaveRequest } from './entity/leave-request.entity';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { Notification } from './entity/notification.entity';
 import { NotificationModule } from './notification/notification.module';
+import { Salary } from './entity/salary.entity';
+import { SalaryModule } from './salary/salary.module';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import { NotificationModule } from './notification/notification.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [Users, Roles, Attendance, Department, Office, LeaveRequest, Notification],
+        entities: [Users, Roles, Attendance, Department, Office, LeaveRequest, Notification, Salary],
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE'),
         options: {
           encrypt: false,
@@ -56,6 +58,7 @@ import { NotificationModule } from './notification/notification.module';
     LeaveModule,
     DashboardModule,
     NotificationModule,
+    SalaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
