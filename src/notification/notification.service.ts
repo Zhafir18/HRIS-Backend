@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../entity/notification.entity';
+import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   async create(user_id: string, title: string, message: string): Promise<Notification> {
@@ -17,7 +19,12 @@ export class NotificationService {
       message,
       is_read: false,
     });
-    return this.notificationRepository.save(notification);
+    const savedNotification = await this.notificationRepository.save(notification);
+    
+    // Push notification to user via WebSocket
+    this.notificationGateway.sendToUser(user_id, savedNotification);
+    
+    return savedNotification;
   }
 
   async findMyNotifications(user_id: string): Promise<Notification[]> {
