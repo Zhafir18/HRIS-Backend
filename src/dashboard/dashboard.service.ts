@@ -41,12 +41,17 @@ export class DashboardService {
       .andWhere('attendance.status = :status', { status: AttendanceStatus.TELAT })
       .getCount();
 
-    const onLeave = await this.leaveRequestRepository
-      .createQueryBuilder('leave')
-      .where('leave.status = :status', { status: LeaveStatus.APPROVED })
-      .andWhere('CAST(leave.start_date AS DATE) <= CURRENT_DATE')
-      .andWhere('CAST(leave.end_date AS DATE) >= CURRENT_DATE')
-      .getCount();
+    let onLeave = 0;
+    try {
+      onLeave = await this.leaveRequestRepository
+        .createQueryBuilder('leave')
+        .where('leave.status = :status', { status: LeaveStatus.APPROVED })
+        .andWhere('CAST(leave.start_date AS DATE) <= CURRENT_DATE')
+        .andWhere('CAST(leave.end_date AS DATE) >= CURRENT_DATE')
+        .getCount();
+    } catch (error) {
+      console.warn('Could not query leave requests (table might not exist):', error.message);
+    }
 
     return {
       totalEmployees,
