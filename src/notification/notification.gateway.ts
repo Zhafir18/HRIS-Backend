@@ -51,21 +51,23 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
       const userId = payload.id;
 
       // Join a room specific to this user
-      await client.join(`user:${userId}`);
+      const roomName = `user:${userId}`;
+      await client.join(roomName);
       
-      console.log(`[WS] Client ${client.id} connected and joined room user:${userId}`);
+      console.log(`[WS] SUCCESS: Client ${client.id} joined room ${roomName}`);
     } catch (err) {
-      console.log(`[WS] Connection rejected: Invalid token for client ${client.id}`);
+      console.log(`[WS] ERROR: Connection rejected for client ${client.id}. Reason: ${err.message}`);
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`[WS] Client disconnected: ${client.id}`);
+    console.log(`[WS] DISCONNECT: Client ${client.id}`);
   }
 
   sendToUser(userId: string, data: any) {
-    this.server.to(`user:${userId}`).emit('notification', data);
-    console.log(`[WS] Emitted notification to user:${userId}`);
+    const roomName = `user:${userId}`;
+    this.server.to(roomName).emit('notification', data);
+    console.log(`[WS] EMIT: Sent notification to ${roomName}. Data title: ${data.title}`);
   }
 }
