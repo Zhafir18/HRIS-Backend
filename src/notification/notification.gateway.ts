@@ -9,15 +9,16 @@ import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
-    origin: true,
+    origin: (origin, callback) => {
+        // Allow all origins to connect with credentials
+        callback(null, true);
+    },
     credentials: true,
   },
 })
 export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-
-  private connectedClients: Map<string, string[]> = new Map(); // userId -> socketIds[]
 
   constructor(private readonly jwtService: JwtService) {}
 
@@ -27,16 +28,21 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
       let token = client.handshake.auth?.token;
       
       if (!token) {
-        // Fallback to cookies if available
-        const cookieStr = client.handshake.headers.cookie;
-        if (cookieStr) {
-          const cookies = Object.fromEntries(cookieStr.split('; ').map(c => c.split('=')));
-          token = cookies['access_token'];
+        // More robust cookie parsing
+        const cookieHeader = client.handshake.headers.cookie;
+        if (cookieHeader) {
+          const tokenCookie = cookieHeader
+            .split(';')
+            .find(c => c.trim().startsWith('access_token='));
+          
+          if (tokenCookie) {
+            token = tokenCookie.split('=')[1];
+          }
         }
       }
 
       if (!token) {
-        console.log(`Connection rejected: No token provided for client ${client.id}`);
+        console.log(`[WS] Connection rejected: No token for client ${client.id}`);
         client.disconnect();
         return;
       }
@@ -44,38 +50,22 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
       const payload = await this.jwtService.verifyAsync(token);
       const userId = payload.id;
 
-      if (!this.connectedClients.has(userId)) {
-        this.connectedClients.set(userId, []);
-      }
-      this.connectedClients?.get(userId)?.push(client.id);
+      // Join a room specific to this user
+      await client.join(`user:${userId}`);
       
-      console.log(`Client connected: ${client.id} (User: ${userId})`);
+      console.log(`[WS] Client ${client.id} connected and joined room user:${userId}`);
     } catch (err) {
-      console.log(`Connection rejected: Invalid token for client ${client.id}`);
+      console.log(`[WS] Connection rejected: Invalid token for client ${client.id}`);
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    for (const [userId, sockets] of this.connectedClients.entries()) {
-      const index = sockets.indexOf(client.id);
-      if (index !== -1) {
-        sockets.splice(index, 1);
-        if (sockets.length === 0) {
-          this.connectedClients.delete(userId);
-        }
-        break;
-      }
-    }
-    console.log(`Client disconnected: ${client.id}`);
+    console.log(`[WS] Client disconnected: ${client.id}`);
   }
 
   sendToUser(userId: string, data: any) {
-    const socketIds = this.connectedClients.get(userId);
-    if (socketIds) {
-      socketIds.forEach((socketId) => {
-        this.server.to(socketId).emit('notification', data);
-      });
-    }
+    this.server.to(`user:${userId}`).emit('notification', data);
+    console.log(`[WS] Emitted notification to user:${userId}`);
   }
 }
