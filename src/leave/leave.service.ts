@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { LeaveRequest, LeaveStatus } from 'src/entity/leave-request.entity';
 import { CreateLeaveRequestDto, UpdateLeaveStatusDto } from './dto/leave.dto';
 import { PaginatedResult } from 'src/common/pagination.dto';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class LeaveService {
   constructor(
     @InjectRepository(LeaveRequest)
     private readonly leaveRepository: Repository<LeaveRequest>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async create(user_id: string, data: CreateLeaveRequestDto): Promise<LeaveRequest> {
@@ -67,12 +69,21 @@ export class LeaveService {
       throw new NotFoundException('Leave request not found');
     }
 
+    const oldStatus = leave.status;
     leave.status = data.status;
     if (data.admin_notes) {
       leave.admin_notes = data.admin_notes;
     }
 
-    return this.leaveRepository.save(leave);
+    const savedLeave = await this.leaveRepository.save(leave);
+
+    if (oldStatus !== data.status && (data.status === LeaveStatus.APPROVED || data.status === LeaveStatus.REJECTED)) {
+      const title = `Leave Request ${data.status.charAt(0) + data.status.slice(1).toLowerCase()}`;
+      const message = `Your leave request from ${leave.start_date} to ${leave.end_date} has been ${data.status.toLowerCase()}.${data.admin_notes ? ` Notes: ${data.admin_notes}` : ''}`;
+      await this.notificationService.create(leave.user_id, title, message);
+    }
+
+    return savedLeave;
   }
 
   async remove(id: string, user_id: string): Promise<void> {

@@ -19,6 +19,8 @@ import { join } from 'path';
 import { LeaveModule } from './leave/leave.module';
 import { LeaveRequest } from './entity/leave-request.entity';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { Notification } from './entity/notification.entity';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [Users, Roles, Attendance, Department, Office, LeaveRequest],
+        entities: [Users, Roles, Attendance, Department, Office, LeaveRequest, Notification],
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE'),
         options: {
           encrypt: false,
@@ -53,6 +55,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     }),
     LeaveModule,
     DashboardModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
