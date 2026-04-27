@@ -24,6 +24,13 @@ export class UsersService {
     });
   }
 
+  async findByResetToken(token: string): Promise<Users | null> {
+    return this.usersRepository.findOne({
+      where: { reset_password_token: token },
+      select: ['id', 'email', 'password', 'reset_password_expires'],
+    });
+  }
+
   async findOne(id: string): Promise<any> {
     const user = await this.usersRepository.findOne({
       where: { id },

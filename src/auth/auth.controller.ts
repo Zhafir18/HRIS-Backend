@@ -1,6 +1,8 @@
 import { Controller, Post, Body, Res, Req } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { CreateUserDto } from "src/users/dto/users.dto";
 import type { Response, Request } from "express";
 
@@ -36,5 +38,15 @@ export class AuthController {
     return {
       message: 'Logout successful'
     };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: ResetPasswordDto) {
+    return this.authService.resetPassword(body.token, body.password);
   }
 }

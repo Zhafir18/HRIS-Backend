@@ -9,10 +9,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
 
 import { UsersModule } from 'src/users/users.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     UsersModule,
+    MailModule,
     TypeOrmModule.forFeature([Users]),
     JwtModule.registerAsync({
       inject: [ConfigService],
