@@ -46,11 +46,11 @@ export class Users {
 
   @Exclude()
   @Column({ type: 'varchar', length: 255, nullable: true })
-  reset_password_token: string;
+  reset_password_token: string | null;
 
   @Exclude()
   @Column({ type: 'timestamp', nullable: true })
-  reset_password_expires: Date;
+  reset_password_expires: Date | null;
 
   @ManyToOne(() => Roles, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
