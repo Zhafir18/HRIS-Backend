@@ -78,6 +78,7 @@ jobs:
               -e DB_DATABASE=${{ secrets.DB_DATABASE }} \
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
               -e CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+              -e GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
               -e TZ=Asia/Jakarta \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             

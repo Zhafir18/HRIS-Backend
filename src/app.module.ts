@@ -23,6 +23,7 @@ import { Notification } from './entity/notification.entity';
 import { NotificationModule } from './notification/notification.module';
 import { Salary } from './entity/salary.entity';
 import { SalaryModule } from './salary/salary.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { SalaryModule } from './salary/salary.module';
     DashboardModule,
     NotificationModule,
     SalaryModule,
+    ChatbotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
