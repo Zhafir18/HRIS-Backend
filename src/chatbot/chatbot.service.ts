@@ -11,7 +11,7 @@ export class ChatbotService {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
     if (apiKey && apiKey !== 'your_api_key_here') {
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
     } else {
       console.warn('GEMINI_API_KEY is not set or is still the placeholder. Chatbot will not work.');
     }
