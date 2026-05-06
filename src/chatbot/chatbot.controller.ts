@@ -3,6 +3,7 @@ import { ChatbotService } from './chatbot.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('chatbot')
+@UseGuards(JwtAuthGuard)
 export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 

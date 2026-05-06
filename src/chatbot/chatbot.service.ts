@@ -9,11 +9,18 @@ export class ChatbotService {
 
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-    this.genAI = new GoogleGenerativeAI(apiKey!);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    if (apiKey && apiKey !== 'your_api_key_here') {
+      this.genAI = new GoogleGenerativeAI(apiKey);
+      this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    } else {
+      console.warn('GEMINI_API_KEY is not set or is still the placeholder. Chatbot will not work.');
+    }
   }
 
   async getChatResponse(prompt: string, history: { role: string; parts: { text: string }[] }[]) {
+    if (!this.model) {
+      return 'Maaf, fitur chatbot sedang tidak tersedia (API Key belum dikonfigurasi).';
+    }
     try {
       const chat = this.model.startChat({
         history: history,
